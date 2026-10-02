@@ -2,21 +2,20 @@ import React, { useState } from 'react';
 import { useAuth } from '../context/AuthContext';
 import { SharkLogo } from './SharkLogo';
 import { 
-  Anchor, 
-  Ship, 
+  Boxes, 
   ShieldCheck, 
   KeyRound, 
   Mail, 
   User, 
-  Sparkles, 
   ArrowRight, 
   CheckCircle2, 
   AlertCircle,
   Eye,
   EyeOff,
   Waves,
-  Boxes,
-  Zap
+  Zap,
+  Container as ContainerIcon,
+  Anchor
 } from 'lucide-react';
 import confetti from 'canvas-confetti';
 
@@ -56,16 +55,16 @@ export const LoginScreen: React.FC = () => {
           return;
         }
         await registerWithEmail(email, password, fullName);
-        setSuccessMsg('Akun berhasil dibuat! Mengalihkan ke sistem...');
+        setSuccessMsg('Akun staf terminal berhasil dibuat! Mengalihkan ke sistem...');
         confetti({ particleCount: 60, spread: 70, origin: { y: 0.6 } });
       } else {
         await loginWithEmail(email, password);
-        setSuccessMsg('Login berhasil! Selamat datang di Sistem NAZLA BAHARI.');
+        setSuccessMsg('Login berhasil! Selamat datang di Terminal Petikemas NAZLA.');
       }
     } catch (err: any) {
       console.error(err);
       if (err.code === 'auth/invalid-credential' || err.code === 'auth/wrong-password' || err.code === 'auth/user-not-found') {
-        setErrorMsg('Email atau kata sandi tidak cocok. Gunakan fitur "Login Cepat Demo" untuk akses instan.');
+        setErrorMsg('Email atau kata sandi tidak cocok. Silakan gunakan fitur "Login Cepat Demo" untuk akses instan.');
       } else if (err.code === 'auth/email-already-in-use') {
         setErrorMsg('Email ini sudah terdaftar. Silakan gunakan tab Masuk.');
       } else {
@@ -99,7 +98,7 @@ export const LoginScreen: React.FC = () => {
     } catch (err: any) {
       console.error(err);
       if (err.code !== 'auth/popup-closed-by-user') {
-        setErrorMsg('Login Google dibatalkan atau terkendala popup.');
+        setErrorMsg('Login Google dibatalkan atau terkendala popup browser.');
       }
     } finally {
       setLoading(false);
@@ -127,43 +126,43 @@ export const LoginScreen: React.FC = () => {
         
         {/* Left Side: Hero Info & Branding PT NAZLA */}
         <div className="lg:col-span-6 space-y-6 text-slate-800">
-          <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-sky-500/10 border border-sky-400/30 text-sky-700 text-xs font-bold uppercase tracking-wider">
+          <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-sky-500/10 border border-sky-400/30 text-sky-700 text-xs font-bold uppercase tracking-wider">
             <Anchor className="w-3.5 h-3.5 text-sky-600" />
-            <span>Perusahaan Pelayaran Resmi Milik NAZLA</span>
+            <span>Terminal Petikemas Resmi Milik NAZLA</span>
           </div>
 
           <h1 className="text-3xl sm:text-4xl lg:text-5xl font-extrabold text-slate-900 tracking-tight leading-tight font-['Plus_Jakarta_Sans',sans-serif]">
-            Manajemen Muatan & Manifes Kapal Penumpang <span className="bg-gradient-to-r from-sky-600 via-blue-600 to-cyan-600 bg-clip-text text-transparent">Shark Line</span>
+            Sistem Operasional Terminal Petikemas <span className="bg-gradient-to-r from-sky-600 via-blue-600 to-cyan-600 bg-clip-text text-transparent">Shark Port</span>
           </h1>
 
           <p className="text-base text-slate-600 leading-relaxed">
-            Platform operasional terpadu PT NAZLA Bahari Marine untuk pencatatan bagasi penumpang, kargo logistik, kendaraan ro-ro, kapasitas tonase palka, dan verifikasi kelaiklautan secara real-time.
+            Pusat komando operasional digital PT NAZLA Terminal Petikemas untuk kontrol pergerakan kontainer (20ft/40ft/Reefer), perencanaan Container Yard (CY), penerbitan EIR Gate-In/Out, dan monitoring sandar kapal petikemas.
           </p>
 
           {/* Value Badges */}
           <div className="grid grid-cols-2 gap-3 pt-2">
             <div className="p-3.5 bg-white/80 rounded-2xl border border-sky-100 shadow-sm flex items-start gap-3 backdrop-blur-sm">
               <div className="p-2 rounded-xl bg-sky-100 text-sky-600">
-                <Ship className="w-5 h-5" />
+                <Boxes className="w-5 h-5" />
               </div>
               <div>
-                <h4 className="font-bold text-sm text-slate-800">Armada Kapal Hiu</h4>
-                <p className="text-xs text-slate-500">Monitoring muatan kapal penumpang</p>
+                <h4 className="font-bold text-sm text-slate-800">Container Yard (CY)</h4>
+                <p className="text-xs text-slate-500">Stowing blok & slot tier otomatis</p>
               </div>
             </div>
 
             <div className="p-3.5 bg-white/80 rounded-2xl border border-sky-100 shadow-sm flex items-start gap-3 backdrop-blur-sm">
               <div className="p-2 rounded-xl bg-cyan-100 text-cyan-600">
-                <Boxes className="w-5 h-5" />
+                <Zap className="w-5 h-5 text-cyan-600" />
               </div>
               <div>
-                <h4 className="font-bold text-sm text-slate-800">Manifes & Kargo</h4>
-                <p className="text-xs text-slate-500">Kalkulasi tonase & posisi palka otomatis</p>
+                <h4 className="font-bold text-sm text-slate-800">Gate & Vessel Ops</h4>
+                <p className="text-xs text-slate-500">Job slip EIR & kapal sandar real-time</p>
               </div>
             </div>
           </div>
 
-          {/* Quick Demo Section on Hero side for convenience */}
+          {/* Quick Demo Section on Hero side */}
           <div className="p-4 rounded-2xl bg-gradient-to-r from-sky-600 to-blue-700 text-white shadow-lg shadow-sky-600/20">
             <div className="flex items-center gap-2 font-bold text-sm mb-1.5">
               <Zap className="w-4 h-4 text-amber-300 fill-amber-300" />
@@ -198,7 +197,7 @@ export const LoginScreen: React.FC = () => {
                 ) : (
                   <>
                     <Anchor className="w-4 h-4 text-cyan-200" />
-                    <span>Masuk Operator Muatan</span>
+                    <span>Masuk Operator CY & Gate</span>
                   </>
                 )}
               </button>
@@ -214,12 +213,12 @@ export const LoginScreen: React.FC = () => {
             <div className="flex items-center justify-between mb-6">
               <div>
                 <h2 className="text-2xl font-black text-slate-900 font-['Plus_Jakarta_Sans',sans-serif]">
-                  {isRegister ? 'Daftar Akun Baru' : 'Login Admin & Petugas'}
+                  {isRegister ? 'Daftar Akun Baru' : 'Login Admin Terminal'}
                 </h2>
                 <p className="text-xs text-slate-500 mt-0.5">
                   {isRegister 
-                    ? 'Buat kredensial login staf operasional muatan' 
-                    : 'Masuk dengan kredensial terdaftar atau demo cepat'}
+                    ? 'Buat kredensial staf operasional terminal petikemas' 
+                    : 'Masuk dengan email admin atau gunakan klik login cepat'}
                 </p>
               </div>
 
@@ -249,7 +248,7 @@ export const LoginScreen: React.FC = () => {
               {isRegister && (
                 <div>
                   <label className="block text-xs font-bold text-slate-700 mb-1.5">
-                    Nama Lengkap / Jabatan
+                    Nama Lengkap / Jabatan Operasional
                   </label>
                   <div className="relative">
                     <User className="w-4 h-4 text-slate-400 absolute left-3.5 top-1/2 -translate-y-1/2" />
@@ -257,7 +256,7 @@ export const LoginScreen: React.FC = () => {
                       type="text"
                       value={fullName}
                       onChange={(e) => setFullName(e.target.value)}
-                      placeholder="Contoh: Capt. Nazla Bahari"
+                      placeholder="Contoh: Nazla Syafiq (Plannner CY)"
                       className="w-full pl-10 pr-4 py-2.5 rounded-xl border border-slate-200 focus:outline-none focus:ring-2 focus:ring-sky-500 focus:border-sky-500 text-sm transition-all"
                       required={isRegister}
                     />
@@ -275,7 +274,7 @@ export const LoginScreen: React.FC = () => {
                     type="email"
                     value={email}
                     onChange={(e) => setEmail(e.target.value)}
-                    placeholder="admin.nazla@nazlabahari.com"
+                    placeholder="admin.nazla@nazlacontainer.com"
                     className="w-full pl-10 pr-4 py-2.5 rounded-xl border border-slate-200 focus:outline-none focus:ring-2 focus:ring-sky-500 focus:border-sky-500 text-sm transition-all"
                     required
                   />
@@ -316,7 +315,7 @@ export const LoginScreen: React.FC = () => {
                   <div className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
                 ) : (
                   <>
-                    <span>{isRegister ? 'Buat Akun & Masuk' : 'Masuk ke Dashboard'}</span>
+                    <span>{isRegister ? 'Buat Akun & Masuk' : 'Masuk ke Dashboard Terminal'}</span>
                     <ArrowRight className="w-4 h-4" />
                   </>
                 )}
@@ -399,7 +398,7 @@ export const LoginScreen: React.FC = () => {
       {/* Footer info */}
       <footer className="w-full max-w-7xl mx-auto px-4 sm:px-6 py-4 flex flex-col sm:flex-row items-center justify-between text-xs text-slate-500 border-t border-sky-200/60 z-10">
         <div className="flex items-center gap-2">
-          <span>&copy; {new Date().getFullYear()} <strong>PT NAZLA BAHARI MARINE LOGISTICS</strong>. Hak Cipta Dilindungi.</span>
+          <span>&copy; {new Date().getFullYear()} <strong>PT NAZLA TERMINAL PETIKEMAS</strong>. Hak Cipta Dilindungi.</span>
         </div>
         <div className="mt-1 sm:mt-0 font-medium text-sky-700 flex items-center gap-1.5">
           <Waves className="w-3.5 h-3.5 text-sky-500" />

@@ -28,27 +28,36 @@ service cloud.firestore {
       return resource.data;
     }
 
-    // Validation for Ship entity
-    function isValidShip(data) {
-      return data.name is string && data.name.size() > 0 && data.name.size() <= 100
-        && data.code is string && data.code.size() > 0 && data.code.size() <= 30
-        && data.type is string && data.type.size() <= 50
-        && data.maxPassengers is number && data.maxPassengers >= 0
-        && data.maxCargoWeightKg is number && data.maxCargoWeightKg >= 0
-        && data.originPort is string && data.originPort.size() <= 80
-        && data.destPort is string && data.destPort.size() <= 80
-        && data.status in ['Siap Muat / Sandar', 'Sedang Berlayar', 'Selesai Bongkar', 'Docking / Perawatan'];
+    // Validation for Container entity
+    function isValidContainer(data) {
+      return data.containerNumber is string && data.containerNumber.size() > 0 && data.containerNumber.size() <= 30
+        && data.size in ['20ft', '40ft', '45ft']
+        && data.type is string && data.type.size() <= 40
+        && data.status in ['Di Lapangan (CY)', 'Gate-In Terdaftar', 'Loading ke Kapal', 'Discharge / Bongkar', 'Gate-Out Keluar']
+        && data.category in ['Impor', 'Ekspor', 'Domestik', 'Transshipment', 'Empty (Kosong)']
+        && data.grossWeightKg is number && data.grossWeightKg >= 0
+        && data.yardBlock is string && data.yardBlock.size() <= 60
+        && data.shippingLine is string && data.shippingLine.size() <= 80;
     }
 
-    // Validation for CargoManifest entity
-    function isValidCargoManifest(data) {
-      return data.manifestNumber is string && data.manifestNumber.size() > 0 && data.manifestNumber.size() <= 40
-        && data.shipId is string && data.shipId.size() > 0 && data.shipId.size() <= 128
-        && data.senderOrPassenger is string && data.senderOrPassenger.size() > 0 && data.senderOrPassenger.size() <= 100
-        && data.category is string && data.category.size() <= 60
-        && data.weightKg is number && data.weightKg >= 0
-        && data.shippingFee is number && data.shippingFee >= 0
-        && data.status in ['Terdaftar', 'Proses Muat / Stowing', 'Di Atas Kapal', 'Tiba & Siap Ambil', 'Telah Diserahkan'];
+    // Validation for YardBlock entity
+    function isValidYardBlock(data) {
+      return data.code is string && data.code.size() > 0 && data.code.size() <= 30
+        && data.name is string && data.name.size() > 0 && data.name.size() <= 80
+        && data.zoneType is string && data.zoneType.size() <= 50
+        && data.maxTeuCapacity is number && data.maxTeuCapacity > 0
+        && data.maxTiers is number && data.maxTiers > 0
+        && data.status in ['Operasional Aktif', 'Penuh / Full', 'Maintenance / Perbaikan'];
+    }
+
+    // Validation for Vessel entity
+    function isValidVessel(data) {
+      return data.name is string && data.name.size() > 0 && data.name.size() <= 80
+        && data.callsign is string && data.callsign.size() > 0 && data.callsign.size() <= 30
+        && data.berthLocation is string && data.berthLocation.size() <= 60
+        && data.targetTeus is number && data.targetTeus >= 0
+        && data.status in ['Sandar / Berthed', 'Bongkar Muat (Working)', 'Menunggu Pandu', 'Berlayar (Departed)']
+        && data.shippingLine is string && data.shippingLine.size() <= 80;
     }
 
     // Validation for UserProfile entity
@@ -58,32 +67,49 @@ service cloud.firestore {
         && data.role in ['admin', 'superadmin', 'operator'];
     }
 
-    // Ships Collection
-    match /ships/{shipId} {
+    // Containers Collection
+    match /containers/{containerId} {
       allow get, list: if isSignedIn();
-      allow create: if isSignedIn() && isValidId(shipId) && isValidShip(incoming())
+      allow create: if isSignedIn() && isValidId(containerId) && isValidContainer(incoming())
         && incoming().createdBy == request.auth.uid;
-      allow update: if isSignedIn() && isValidId(shipId) && isValidShip(incoming())
+      allow update: if isSignedIn() && isValidId(containerId) && isValidContainer(incoming())
         && incoming().createdBy == existing().createdBy;
-      allow delete: if isSignedIn() && isValidId(shipId);
+      allow delete: if isSignedIn() && isValidId(containerId);
     }
 
-    // Cargo Manifests Collection
-    match /cargo_manifests/{manifestId} {
+    // Yard Blocks Collection
+    match /yard_blocks/{blockId} {
       allow get, list: if isSignedIn();
-      allow create: if isSignedIn() && isValidId(manifestId) && isValidCargoManifest(incoming())
+      allow create: if isSignedIn() && isValidId(blockId) && isValidYardBlock(incoming())
         && incoming().createdBy == request.auth.uid;
-      allow update: if isSignedIn() && isValidId(manifestId) && isValidCargoManifest(incoming())
+      allow update: if isSignedIn() && isValidId(blockId) && isValidYardBlock(incoming())
         && incoming().createdBy == existing().createdBy;
-      allow delete: if isSignedIn() && isValidId(manifestId);
+      allow delete: if isSignedIn() && isValidId(blockId);
+    }
+
+    // Vessels Collection
+    match /vessels/{vesselId} {
+      allow get, list: if isSignedIn();
+      allow create: if isSignedIn() && isValidId(vesselId) && isValidVessel(incoming())
+        && incoming().createdBy == request.auth.uid;
+      allow update: if isSignedIn() && isValidId(vesselId) && isValidVessel(incoming())
+        && incoming().createdBy == existing().createdBy;
+      allow delete: if isSignedIn() && isValidId(vesselId);
     }
 
     // User Profiles Collection
     match /user_profiles/{userId} {
-      allow get: if isSignedIn();
-      allow list: if isSignedIn();
+      allow get, list: if isSignedIn();
       allow create, update: if isSignedIn() && isOwner(userId) && isValidUserProfile(incoming());
       allow delete: if isSignedIn() && isOwner(userId);
+    }
+
+    // Backward-compatibility matches if any legacy collection queried
+    match /ships/{shipId} {
+      allow read, write: if isSignedIn();
+    }
+    match /cargo_manifests/{manifestId} {
+      allow read, write: if isSignedIn();
     }
   }
 }

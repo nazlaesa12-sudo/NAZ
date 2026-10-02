@@ -1,59 +1,75 @@
 {
   "entities": {
-    "Ship": {
-      "title": "Ship",
-      "description": "Armada kapal penumpang dan muatan milik PT NAZLA",
+    "Container": {
+      "title": "Container",
+      "description": "Petikemas / kontainer operasional terminal pelabuhan PT NAZLA",
       "type": "object",
       "properties": {
-        "name": { "type": "string", "maxLength": 100 },
-        "code": { "type": "string", "maxLength": 30 },
-        "type": { "type": "string", "maxLength": 50 },
-        "captain": { "type": "string", "maxLength": 100 },
-        "maxPassengers": { "type": "number" },
-        "maxCargoWeightKg": { "type": "number" },
-        "maxVolumeM3": { "type": "number" },
-        "originPort": { "type": "string", "maxLength": 80 },
-        "destPort": { "type": "string", "maxLength": 80 },
-        "status": { "type": "string", "enum": ["Siap Muat / Sandar", "Sedang Berlayar", "Selesai Bongkar", "Docking / Perawatan"] },
-        "departureTime": { "type": "string", "maxLength": 50 },
-        "arrivalTime": { "type": "string", "maxLength": 50 },
-        "deckLayout": { "type": "string", "maxLength": 200 },
+        "containerNumber": { "type": "string", "maxLength": 30 },
+        "isoCode": { "type": "string", "maxLength": 10 },
+        "size": { "type": "string", "enum": ["20ft", "40ft", "45ft"] },
+        "type": { "type": "string", "maxLength": 40 },
+        "status": { "type": "string", "enum": ["Di Lapangan (CY)", "Gate-In Terdaftar", "Loading ke Kapal", "Discharge / Bongkar", "Gate-Out Keluar"] },
+        "category": { "type": "string", "enum": ["Impor", "Ekspor", "Domestik", "Transshipment", "Empty (Kosong)"] },
+        "grossWeightKg": { "type": "number" },
+        "tareWeightKg": { "type": "number" },
+        "sealNumber": { "type": "string", "maxLength": 40 },
+        "shippingLine": { "type": "string", "maxLength": 80 },
+        "consignee": { "type": "string", "maxLength": 100 },
+        "yardBlock": { "type": "string", "maxLength": 60 },
+        "yardSlot": { "type": "string", "maxLength": 40 },
+        "vesselName": { "type": "string", "maxLength": 80 },
+        "voyageNumber": { "type": "string", "maxLength": 40 },
+        "reeferTemp": { "type": "string", "maxLength": 20 },
+        "isHazardous": { "type": "boolean" },
+        "dgClass": { "type": "string", "maxLength": 50 },
+        "handlingFee": { "type": "number" },
         "createdBy": { "type": "string", "maxLength": 128 },
         "createdAt": { "type": "string", "maxLength": 50 },
         "updatedAt": { "type": "string", "maxLength": 50 }
       },
-      "required": ["name", "code", "type", "maxPassengers", "maxCargoWeightKg", "originPort", "destPort", "status"]
+      "required": ["containerNumber", "size", "type", "status", "category", "grossWeightKg", "yardBlock", "shippingLine"]
     },
-    "CargoManifest": {
-      "title": "CargoManifest",
-      "description": "Data manifes muatan barang dan bagasi kapal penumpang",
+    "YardBlock": {
+      "title": "YardBlock",
+      "description": "Blok lapangan penumpukan (Container Yard) terminal PT NAZLA",
       "type": "object",
       "properties": {
-        "manifestNumber": { "type": "string", "maxLength": 40 },
-        "shipId": { "type": "string", "maxLength": 128 },
-        "shipName": { "type": "string", "maxLength": 100 },
-        "senderOrPassenger": { "type": "string", "maxLength": 100 },
-        "identityNumber": { "type": "string", "maxLength": 50 },
-        "contactPhone": { "type": "string", "maxLength": 30 },
-        "category": { "type": "string", "maxLength": 60 },
-        "description": { "type": "string", "maxLength": 300 },
-        "itemCount": { "type": "number" },
-        "weightKg": { "type": "number" },
-        "volumeM3": { "type": "number" },
-        "deckPosition": { "type": "string", "maxLength": 100 },
-        "handlingNotes": { "type": "string", "maxLength": 300 },
-        "shippingFee": { "type": "number" },
-        "paymentStatus": { "type": "string", "enum": ["Lunas", "Belum Lunas", "Ditagihkan di Tujuan"] },
-        "status": { "type": "string", "enum": ["Terdaftar", "Proses Muat / Stowing", "Di Atas Kapal", "Tiba & Siap Ambil", "Telah Diserahkan"] },
+        "code": { "type": "string", "maxLength": 30 },
+        "name": { "type": "string", "maxLength": 80 },
+        "zoneType": { "type": "string", "maxLength": 50 },
+        "maxTeuCapacity": { "type": "number" },
+        "maxTiers": { "type": "number" },
+        "equipmentAssigned": { "type": "string", "maxLength": 100 },
+        "status": { "type": "string", "enum": ["Operasional Aktif", "Penuh / Full", "Maintenance / Perbaikan"] },
         "createdBy": { "type": "string", "maxLength": 128 },
         "createdAt": { "type": "string", "maxLength": 50 },
         "updatedAt": { "type": "string", "maxLength": 50 }
       },
-      "required": ["manifestNumber", "shipId", "senderOrPassenger", "category", "weightKg", "status", "shippingFee"]
+      "required": ["code", "name", "zoneType", "maxTeuCapacity", "maxTiers", "status"]
+    },
+    "Vessel": {
+      "title": "Vessel",
+      "description": "Kapal petikemas yang sandar dan beroperasi di terminal PT NAZLA",
+      "type": "object",
+      "properties": {
+        "name": { "type": "string", "maxLength": 80 },
+        "callsign": { "type": "string", "maxLength": 30 },
+        "berthLocation": { "type": "string", "maxLength": 60 },
+        "eta": { "type": "string", "maxLength": 50 },
+        "etd": { "type": "string", "maxLength": 50 },
+        "targetTeus": { "type": "number" },
+        "status": { "type": "string", "enum": ["Sandar / Berthed", "Bongkar Muat (Working)", "Menunggu Pandu", "Berlayar (Departed)"] },
+        "shippingLine": { "type": "string", "maxLength": 80 },
+        "createdBy": { "type": "string", "maxLength": 128 },
+        "createdAt": { "type": "string", "maxLength": 50 },
+        "updatedAt": { "type": "string", "maxLength": 50 }
+      },
+      "required": ["name", "callsign", "berthLocation", "targetTeus", "status", "shippingLine"]
     },
     "UserProfile": {
       "title": "UserProfile",
-      "description": "Profil akun pengguna dan admin Nazla Bahari",
+      "description": "Profil akun pengguna dan admin Terminal Petikemas Nazla",
       "type": "object",
       "properties": {
         "email": { "type": "string", "maxLength": 120 },
@@ -66,17 +82,21 @@
     }
   },
   "firestore": {
-    "/ships/{shipId}": {
-      "schema": { "$ref": "#/entities/Ship" },
-      "description": "Koleksi armada kapal penumpang PT NAZLA"
+    "/containers/{containerId}": {
+      "schema": { "$ref": "#/entities/Container" },
+      "description": "Koleksi data petikemas terminal PT NAZLA"
     },
-    "/cargo_manifests/{manifestId}": {
-      "schema": { "$ref": "#/entities/CargoManifest" },
-      "description": "Koleksi manifes muatan barang dan bagasi kapal penumpang"
+    "/yard_blocks/{blockId}": {
+      "schema": { "$ref": "#/entities/YardBlock" },
+      "description": "Koleksi blok lapangan penumpukan kontainer (CY)"
+    },
+    "/vessels/{vesselId}": {
+      "schema": { "$ref": "#/entities/Vessel" },
+      "description": "Koleksi kapal petikemas yang sandar di dermaga terminal"
     },
     "/user_profiles/{userId}": {
       "schema": { "$ref": "#/entities/UserProfile" },
-      "description": "Profil pengguna dan admin terdaftar"
+      "description": "Profil pengguna dan staf operasional terdaftar"
     }
   }
 }

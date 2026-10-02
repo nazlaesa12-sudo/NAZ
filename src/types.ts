@@ -1,61 +1,77 @@
-export interface Ship {
+export type ContainerSize = '20ft' | '40ft' | '45ft';
+
+export type ContainerType = 
+  | 'Dry Standard (GP)' 
+  | 'High Cube (HC)' 
+  | 'Reefer Pendingin (RF)' 
+  | 'Open Top (OT)' 
+  | 'Tank Container (TK)' 
+  | 'Flat Rack (FR)';
+
+export type ContainerStatus = 
+  | 'Di Lapangan (CY)' 
+  | 'Gate-In Terdaftar' 
+  | 'Loading ke Kapal' 
+  | 'Discharge / Bongkar' 
+  | 'Gate-Out Keluar';
+
+export type ContainerCategory = 
+  | 'Impor' 
+  | 'Ekspor' 
+  | 'Domestik' 
+  | 'Transshipment' 
+  | 'Empty (Kosong)';
+
+export interface Container {
   id: string;
-  name: string;
-  code: string;
+  containerNumber: string;
+  isoCode: string;
+  size: ContainerSize;
   type: string;
-  captain: string;
-  maxPassengers: number;
-  maxCargoWeightKg: number;
-  maxVolumeM3: number;
-  originPort: string;
-  destPort: string;
-  status: 'Siap Muat / Sandar' | 'Sedang Berlayar' | 'Selesai Bongkar' | 'Docking / Perawatan';
-  departureTime: string;
-  arrivalTime: string;
-  deckLayout: string;
+  status: ContainerStatus;
+  category: ContainerCategory;
+  grossWeightKg: number;
+  tareWeightKg: number;
+  sealNumber: string;
+  shippingLine: string;
+  consignee: string;
+  yardBlock: string;
+  yardSlot: string;
+  vesselName: string;
+  voyageNumber: string;
+  reeferTemp: string;
+  isHazardous: boolean;
+  dgClass: string;
+  handlingFee: number;
   createdBy: string;
   createdAt: string;
   updatedAt: string;
 }
 
-export type CargoCategory = 
-  | 'Bagasi Penumpang' 
-  | 'Kargo Umum / Paket' 
-  | 'Kendaraan Roda 2' 
-  | 'Kendaraan Roda 4 / Mobil' 
-  | 'Bahan Makanan / Palka Dingin' 
-  | 'Barang Khusus / DG Class';
-
-export type CargoStatus = 
-  | 'Terdaftar' 
-  | 'Proses Muat / Stowing' 
-  | 'Di Atas Kapal' 
-  | 'Tiba & Siap Ambil' 
-  | 'Telah Diserahkan';
-
-export type PaymentStatus = 
-  | 'Lunas' 
-  | 'Belum Lunas' 
-  | 'Ditagihkan di Tujuan';
-
-export interface CargoManifest {
+export interface YardBlock {
   id: string;
-  manifestNumber: string;
-  shipId: string;
-  shipName: string;
-  senderOrPassenger: string;
-  identityNumber: string;
-  contactPhone: string;
-  category: CargoCategory;
-  description: string;
-  itemCount: number;
-  weightKg: number;
-  volumeM3: number;
-  deckPosition: string;
-  handlingNotes: string;
-  shippingFee: number;
-  paymentStatus: PaymentStatus;
-  status: CargoStatus;
+  code: string;
+  name: string;
+  zoneType: string;
+  maxTeuCapacity: number;
+  maxTiers: number;
+  equipmentAssigned: string;
+  status: 'Operasional Aktif' | 'Penuh / Full' | 'Maintenance / Perbaikan';
+  createdBy: string;
+  createdAt: string;
+  updatedAt: string;
+}
+
+export interface Vessel {
+  id: string;
+  name: string;
+  callsign: string;
+  berthLocation: string;
+  eta: string;
+  etd: string;
+  targetTeus: number;
+  status: 'Sandar / Berthed' | 'Bongkar Muat (Working)' | 'Menunggu Pandu' | 'Berlayar (Departed)';
+  shippingLine: string;
   createdBy: string;
   createdAt: string;
   updatedAt: string;

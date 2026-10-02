@@ -2,31 +2,30 @@ import React, { useState } from 'react';
 import { useAuth } from '../context/AuthContext';
 import { useData } from '../context/DataContext';
 import { SharkLogo } from './SharkLogo';
-import { ManifestManager } from './ManifestManager';
-import { ShipManager } from './ShipManager';
-import { SafetyMonitor } from './SafetyMonitor';
-import { PrintManifestModal } from './PrintManifestModal';
+import { ContainerManager } from './ContainerManager';
+import { YardManager } from './YardManager';
+import { VesselManager } from './VesselManager';
+import { TerminalSafetyMonitor } from './TerminalSafetyMonitor';
+import { PrintTerminalReportModal } from './PrintTerminalReportModal';
 import { 
   Boxes, 
+  Layers, 
   Ship, 
   ShieldAlert, 
   Printer, 
   LogOut, 
-  Database, 
   Sparkles, 
-  Anchor, 
+  RefreshCw, 
+  CheckCircle2, 
   Waves,
-  RefreshCw,
-  User,
-  CheckCircle2,
-  AlertCircle
+  Zap
 } from 'lucide-react';
 
 export const Dashboard: React.FC = () => {
-  const { currentUser, userProfile, logout, isDbConnected } = useAuth();
-  const { ships, manifests, seedSampleData, loadingData } = useData();
+  const { currentUser, userProfile, logout } = useAuth();
+  const { containers, yardBlocks, vessels, seedSampleData } = useData();
 
-  const [activeTab, setActiveTab] = useState<'manifests' | 'ships' | 'safety'>('manifests');
+  const [activeTab, setActiveTab] = useState<'containers' | 'yard' | 'vessels' | 'safety'>('containers');
   const [isPrintModalOpen, setIsPrintModalOpen] = useState(false);
   const [isSeeding, setIsSeeding] = useState(false);
   const [toastMsg, setToastMsg] = useState<string | null>(null);
@@ -40,7 +39,7 @@ export const Dashboard: React.FC = () => {
     setIsSeeding(true);
     try {
       await seedSampleData();
-      showToast('Data armada kapal & manifes berhasil dimuat ke Firebase Firestore!');
+      showToast('Data master terminal petikemas berhasil dimuat ke Firebase Firestore!');
     } catch (err) {
       console.error(err);
     } finally {
@@ -82,19 +81,19 @@ export const Dashboard: React.FC = () => {
             {/* Database status indicator */}
             <div className="flex items-center gap-2 px-3 py-1.5 rounded-full bg-sky-50 border border-sky-200 text-sky-800 text-xs font-semibold">
               <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span>
-              <span className="hidden sm:inline">Firebase Firestore:</span>
-              <span className="font-bold text-sky-900">Aktif (Live Single Source)</span>
+              <span className="hidden sm:inline">Firebase Cloud:</span>
+              <span className="font-bold text-sky-900">Live Single Source of Truth</span>
             </div>
 
             {/* Seeder Button if empty */}
-            {ships.length === 0 && (
+            {containers.length === 0 && (
               <button
                 onClick={handleSeedData}
                 disabled={isSeeding}
                 className="px-3.5 py-1.5 rounded-full bg-amber-500 hover:bg-amber-600 text-white text-xs font-bold shadow transition-all flex items-center gap-1.5 cursor-pointer animate-bounce"
               >
                 <Sparkles className="w-3.5 h-3.5 text-amber-100" />
-                <span>{isSeeding ? 'Memuat Data...' : 'Muat Data Contoh Maritim'}</span>
+                <span>{isSeeding ? 'Memuat Data...' : 'Muat Data Contoh Terminal'}</span>
               </button>
             )}
 
@@ -105,7 +104,7 @@ export const Dashboard: React.FC = () => {
               </div>
               <div className="text-left">
                 <p className="font-bold text-slate-800 leading-tight">
-                  {userProfile?.displayName || currentUser?.email || 'Admin NAZLA'}
+                  {userProfile?.displayName || currentUser?.email || 'NAZLA (Owner)'}
                 </p>
                 <p className="text-[10px] text-sky-600 font-semibold uppercase">
                   {userProfile?.role || 'SuperAdmin (Owner)'}
@@ -113,13 +112,13 @@ export const Dashboard: React.FC = () => {
               </div>
             </div>
 
-            {/* Print Manifest Action */}
+            {/* Print Terminal Report Action */}
             <button
               onClick={() => setIsPrintModalOpen(true)}
               className="px-3.5 py-1.5 rounded-xl bg-white hover:bg-sky-50 border border-sky-200 text-sky-700 font-bold text-xs flex items-center gap-1.5 transition-colors cursor-pointer shadow-2xs"
             >
               <Printer className="w-4 h-4 text-sky-600" />
-              <span className="hidden sm:inline">Cetak Manifes</span>
+              <span className="hidden sm:inline">Cetak Laporan CY</span>
             </button>
 
             {/* Logout button */}
@@ -141,38 +140,55 @@ export const Dashboard: React.FC = () => {
         {/* Navigation Tabs Bar */}
         <div className="flex flex-wrap items-center justify-between gap-3 border-b border-sky-200/80 pb-3">
           
-          <div className="flex items-center gap-1.5 sm:gap-2 p-1.5 rounded-2xl bg-white border border-sky-100 shadow-2xs">
+          <div className="flex flex-wrap items-center gap-1.5 sm:gap-2 p-1.5 rounded-2xl bg-white border border-sky-100 shadow-2xs">
             <button
-              onClick={() => setActiveTab('manifests')}
+              onClick={() => setActiveTab('containers')}
               className={`px-4 py-2 rounded-xl text-xs sm:text-sm font-bold transition-all flex items-center gap-2 cursor-pointer ${
-                activeTab === 'manifests'
+                activeTab === 'containers'
                   ? 'bg-gradient-to-r from-sky-500 to-blue-600 text-white shadow-md shadow-sky-500/20'
                   : 'text-slate-600 hover:text-sky-600 hover:bg-sky-50'
               }`}
             >
               <Boxes className="w-4 h-4" />
-              <span>Daftar Muatan & Manifes</span>
+              <span>Data Petikemas</span>
               <span className={`px-2 py-0.5 rounded-full text-[10px] ${
-                activeTab === 'manifests' ? 'bg-white/20 text-white' : 'bg-sky-100 text-sky-800 font-bold'
+                activeTab === 'containers' ? 'bg-white/20 text-white' : 'bg-sky-100 text-sky-800 font-bold'
               }`}>
-                {manifests.length}
+                {containers.length}
               </span>
             </button>
 
             <button
-              onClick={() => setActiveTab('ships')}
+              onClick={() => setActiveTab('yard')}
               className={`px-4 py-2 rounded-xl text-xs sm:text-sm font-bold transition-all flex items-center gap-2 cursor-pointer ${
-                activeTab === 'ships'
+                activeTab === 'yard'
+                  ? 'bg-gradient-to-r from-sky-500 to-blue-600 text-white shadow-md shadow-sky-500/20'
+                  : 'text-slate-600 hover:text-sky-600 hover:bg-sky-50'
+              }`}
+            >
+              <Layers className="w-4 h-4" />
+              <span>Container Yard (CY)</span>
+              <span className={`px-2 py-0.5 rounded-full text-[10px] ${
+                activeTab === 'yard' ? 'bg-white/20 text-white' : 'bg-sky-100 text-sky-800 font-bold'
+              }`}>
+                {yardBlocks.length}
+              </span>
+            </button>
+
+            <button
+              onClick={() => setActiveTab('vessels')}
+              className={`px-4 py-2 rounded-xl text-xs sm:text-sm font-bold transition-all flex items-center gap-2 cursor-pointer ${
+                activeTab === 'vessels'
                   ? 'bg-gradient-to-r from-sky-500 to-blue-600 text-white shadow-md shadow-sky-500/20'
                   : 'text-slate-600 hover:text-sky-600 hover:bg-sky-50'
               }`}
             >
               <Ship className="w-4 h-4" />
-              <span>Armada Kapal Penumpang</span>
+              <span>Jadwal Sandar Kapal</span>
               <span className={`px-2 py-0.5 rounded-full text-[10px] ${
-                activeTab === 'ships' ? 'bg-white/20 text-white' : 'bg-sky-100 text-sky-800 font-bold'
+                activeTab === 'vessels' ? 'bg-white/20 text-white' : 'bg-sky-100 text-sky-800 font-bold'
               }`}>
-                {ships.length}
+                {vessels.length}
               </span>
             </button>
 
@@ -185,7 +201,7 @@ export const Dashboard: React.FC = () => {
               }`}
             >
               <ShieldAlert className="w-4 h-4" />
-              <span>Kelaiklautan & Batas Muatan</span>
+              <span>Monitoring K3 & Reefer</span>
             </button>
           </div>
 
@@ -194,7 +210,7 @@ export const Dashboard: React.FC = () => {
             onClick={handleSeedData}
             disabled={isSeeding}
             className="px-3.5 py-2 rounded-xl bg-white hover:bg-sky-50 text-sky-700 border border-sky-200 text-xs font-semibold flex items-center gap-1.5 transition-colors cursor-pointer shadow-2xs"
-            title="Sinkronisasi / Muat Ulang Data Sampel Maritim"
+            title="Muat Ulang / Reset Data Sampel Terminal"
           >
             <RefreshCw className={`w-3.5 h-3.5 text-sky-600 ${isSeeding ? 'animate-spin' : ''}`} />
             <span className="hidden sm:inline">Reset / Muat Contoh Data</span>
@@ -202,14 +218,15 @@ export const Dashboard: React.FC = () => {
         </div>
 
         {/* Tab Views */}
-        {activeTab === 'manifests' && <ManifestManager />}
-        {activeTab === 'ships' && <ShipManager />}
-        {activeTab === 'safety' && <SafetyMonitor />}
+        {activeTab === 'containers' && <ContainerManager />}
+        {activeTab === 'yard' && <YardManager />}
+        {activeTab === 'vessels' && <VesselManager />}
+        {activeTab === 'safety' && <TerminalSafetyMonitor />}
 
       </main>
 
       {/* Official Print Modal */}
-      <PrintManifestModal
+      <PrintTerminalReportModal
         isOpen={isPrintModalOpen}
         onClose={() => setIsPrintModalOpen(false)}
       />
@@ -219,7 +236,7 @@ export const Dashboard: React.FC = () => {
         <div className="max-w-7xl mx-auto px-4 sm:px-6 flex flex-col sm:flex-row items-center justify-between text-xs text-slate-500 gap-2">
           <div className="flex items-center gap-2">
             <SharkLogo size="sm" withText={false} />
-            <span>&copy; {new Date().getFullYear()} <strong>PT NAZLA BAHARI MARINE LOGISTICS</strong>. Sistem Muatan Kapal Penumpang Terintegrasi Firebase Firestore.</span>
+            <span>&copy; {new Date().getFullYear()} <strong>PT NAZLA TERMINAL PETIKEMAS</strong>. Sistem Operasional Terintegrasi Firebase Firestore.</span>
           </div>
           <div className="font-semibold text-sky-700 flex items-center gap-1.5">
             <Waves className="w-4 h-4 text-sky-500" />

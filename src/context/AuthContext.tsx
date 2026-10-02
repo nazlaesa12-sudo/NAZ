@@ -47,10 +47,10 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
             // Create default profile in Firestore
             const newProfile: UserProfile = {
               id: user.uid,
-              email: user.email || 'user@nazlabahari.com',
-              displayName: user.displayName || 'Admin Nazla Bahari',
+              email: user.email || 'admin@nazlacontainer.com',
+              displayName: user.displayName || 'NAZLA (Owner)',
               role: user.email?.includes('super') ? 'superadmin' : 'admin',
-              company: 'PT NAZLA BAHARI MARINE LOGISTICS',
+              company: 'PT NAZLA TERMINAL PETIKEMAS',
               createdAt: new Date().toISOString()
             };
             await setDoc(profileDocRef, newProfile);
@@ -60,10 +60,10 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
           console.warn('Could not sync user profile to firestore:', err);
           setUserProfile({
             id: user.uid,
-            email: user.email || 'admin@nazlabahari.com',
-            displayName: user.displayName || 'Admin Nazla',
+            email: user.email || 'admin@nazlacontainer.com',
+            displayName: user.displayName || 'NAZLA (Owner)',
             role: 'admin',
-            company: 'PT NAZLA BAHARI MARINE LOGISTICS',
+            company: 'PT NAZLA TERMINAL PETIKEMAS',
             createdAt: new Date().toISOString()
           });
         }
@@ -105,7 +105,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
           email: res.user.email || email,
           displayName: name,
           role: 'admin',
-          company: 'PT NAZLA BAHARI MARINE LOGISTICS',
+          company: 'PT NAZLA TERMINAL PETIKEMAS',
           createdAt: new Date().toISOString()
         };
         await setDoc(profileDocRef, newProfile);
@@ -118,9 +118,9 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   };
 
   const loginQuickDemo = async (role: 'admin' | 'operator' = 'admin') => {
-    const demoEmail = role === 'admin' ? 'admin.nazla@nazlabahari.com' : 'operator.shark@nazlabahari.com';
-    const demoPass = 'NazlaBahari2026!';
-    const demoName = role === 'admin' ? 'Nazla Bahari (Owner & SuperAdmin)' : 'Staff Logistik Shark';
+    const demoEmail = role === 'admin' ? 'admin.nazla@nazlacontainer.com' : 'operator.shark@nazlacontainer.com';
+    const demoPass = 'NazlaShark2026!';
+    const demoName = role === 'admin' ? 'NAZLA (Owner & Direktur Utama)' : 'Petugas Lapangan CY Shark';
 
     try {
       await signInWithEmailAndPassword(auth, demoEmail, demoPass);
@@ -137,7 +137,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
               email: demoEmail,
               displayName: demoName,
               role: role === 'admin' ? 'superadmin' : 'operator',
-              company: 'PT NAZLA BAHARI MARINE LOGISTICS',
+              company: 'PT NAZLA TERMINAL PETIKEMAS',
               createdAt: new Date().toISOString()
             };
             await setDoc(profileDocRef, newProfile);
