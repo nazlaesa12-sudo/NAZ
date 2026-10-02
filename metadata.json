@@ -1,0 +1,7 @@
+{
+  "name": "Nazla Bahari - Sistem Manajemen Muatan Kapal Penumpang",
+  "description": "Sistem Informasi Manajemen Muatan dan Manifest Kapal Penumpang PT NAZLA Bahari Marine dengan pemantauan kapasitas kargo, manifes penumpang & bagasi secara real-time.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}
+

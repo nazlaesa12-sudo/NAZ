@@ -1,0 +1,89 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    // Global default-deny
+    match /{document=**} {
+      allow read, write: if false;
+    }
+
+    // Helper functions
+    function isSignedIn() {
+      return request.auth != null;
+    }
+
+    function isOwner(userId) {
+      return isSignedIn() && request.auth.uid == userId;
+    }
+
+    function isValidId(id) {
+      return id is string && id.size() <= 128 && id.matches('^[a-zA-Z0-9_\\-]+$');
+    }
+
+    function incoming() {
+      return request.resource.data;
+    }
+
+    function existing() {
+      return resource.data;
+    }
+
+    // Validation for Ship entity
+    function isValidShip(data) {
+      return data.name is string && data.name.size() > 0 && data.name.size() <= 100
+        && data.code is string && data.code.size() > 0 && data.code.size() <= 30
+        && data.type is string && data.type.size() <= 50
+        && data.maxPassengers is number && data.maxPassengers >= 0
+        && data.maxCargoWeightKg is number && data.maxCargoWeightKg >= 0
+        && data.originPort is string && data.originPort.size() <= 80
+        && data.destPort is string && data.destPort.size() <= 80
+        && data.status in ['Siap Muat / Sandar', 'Sedang Berlayar', 'Selesai Bongkar', 'Docking / Perawatan'];
+    }
+
+    // Validation for CargoManifest entity
+    function isValidCargoManifest(data) {
+      return data.manifestNumber is string && data.manifestNumber.size() > 0 && data.manifestNumber.size() <= 40
+        && data.shipId is string && data.shipId.size() > 0 && data.shipId.size() <= 128
+        && data.senderOrPassenger is string && data.senderOrPassenger.size() > 0 && data.senderOrPassenger.size() <= 100
+        && data.category is string && data.category.size() <= 60
+        && data.weightKg is number && data.weightKg >= 0
+        && data.shippingFee is number && data.shippingFee >= 0
+        && data.status in ['Terdaftar', 'Proses Muat / Stowing', 'Di Atas Kapal', 'Tiba & Siap Ambil', 'Telah Diserahkan'];
+    }
+
+    // Validation for UserProfile entity
+    function isValidUserProfile(data) {
+      return data.email is string && data.email.size() <= 120
+        && data.displayName is string && data.displayName.size() <= 100
+        && data.role in ['admin', 'superadmin', 'operator'];
+    }
+
+    // Ships Collection
+    match /ships/{shipId} {
+      allow get, list: if isSignedIn();
+      allow create: if isSignedIn() && isValidId(shipId) && isValidShip(incoming())
+        && incoming().createdBy == request.auth.uid;
+      allow update: if isSignedIn() && isValidId(shipId) && isValidShip(incoming())
+        && incoming().createdBy == existing().createdBy;
+      allow delete: if isSignedIn() && isValidId(shipId);
+    }
+
+    // Cargo Manifests Collection
+    match /cargo_manifests/{manifestId} {
+      allow get, list: if isSignedIn();
+      allow create: if isSignedIn() && isValidId(manifestId) && isValidCargoManifest(incoming())
+        && incoming().createdBy == request.auth.uid;
+      allow update: if isSignedIn() && isValidId(manifestId) && isValidCargoManifest(incoming())
+        && incoming().createdBy == existing().createdBy;
+      allow delete: if isSignedIn() && isValidId(manifestId);
+    }
+
+    // User Profiles Collection
+    match /user_profiles/{userId} {
+      allow get: if isSignedIn();
+      allow list: if isSignedIn();
+      allow create, update: if isSignedIn() && isOwner(userId) && isValidUserProfile(incoming());
+      allow delete: if isSignedIn() && isOwner(userId);
+    }
+  }
+}
